@@ -1,5 +1,8 @@
 // Import Models
 const Product = require("../model/product");
+const Cart = require("../model/cart");
+
+// Import functions
 const { filterProducts } = require("../helper/filterProducts");
 
 exports.getProducts = async (req, res) => {
@@ -33,7 +36,7 @@ exports.getProducts = async (req, res) => {
 
 exports.getProductsByQuery = async (req, res) => {
   const queryPath = req.query;
-  const pageSize = 2;
+  const pageSize = 8;
   const page = parseInt(queryPath.page) || 1;
 
   try {
@@ -100,6 +103,30 @@ exports.getProduct = async (req, res) => {
     product.price = formattedPrice;
 
     res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Interval Server Error!" });
+  }
+};
+
+exports.postAddToCart = async (req, res) => {
+  const product = req.body.valueProduct;
+  const userId = req.user;
+
+  try {
+    // Check if the user has a shopping cart or not
+    const user = await Cart.findOne({ user: userId });
+
+    if (!user) {
+      return res.status(500).json({ message: "No found cart of user!" });
+    }
+
+    const result = user.addToCart(product);
+
+    if (!result) {
+      return res.status(400).json({ message: "Add to cart failled!" });
+    }
+
+    res.status(200).json({ message: "Add to cart success!" });
   } catch (error) {
     res.status(500).json({ message: "Interval Server Error!" });
   }

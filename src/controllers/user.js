@@ -6,6 +6,7 @@ const jwt = require("../helper/jwt");
 
 // Import Models
 const User = require("../model/user");
+const Cart = require("../model/cart");
 
 exports.postSignUpUser = async (req, res) => {
   try {
@@ -72,13 +73,13 @@ exports.postLoginUser = async (req, res) => {
     // Find user in database (User)
     const user = await User.findOne({ email: formValues.email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid Emaiil or Password!" });
+      return res.status(401).json({ message: "Invalid Email or Password!" });
     }
 
     // Check password is correct
     const doMatch = await bcrypt.compare(formValues.password, user.password);
     if (!doMatch) {
-      return res.status(401).json({ message: "Invalid Emaiil or Password!" });
+      return res.status(401).json({ message: "Invalid Email or Password!" });
     }
 
     // Create accessToken + refreshToken
@@ -95,15 +96,34 @@ exports.postLoginUser = async (req, res) => {
       throw new Error("JWT is not working!");
     }
 
-    // Save refreshToken in database
+    // Save refreshToken + create new cart in database
     user.state = {
       refreshToken: refreshToken,
     };
 
-    const result = await user.save();
+    const resultUser = await user.save();
 
-    if (!result) {
+    if (!resultUser) {
       return res.status(500).json({ message: "Internal Server Error!" });
+    }
+
+    // Check if the user has a shopping cart or not
+    const existingCart = await Cart.findOne({ user: user._id }).select(
+      "items totalPrice"
+    );
+
+    if (!existingCart) {
+      const cart = await new Cart({
+        user: user._id,
+        items: [],
+        totalPrice: "0",
+      });
+
+      // Save database
+      const resultCart = await cart.save();
+      if (!resultCart) {
+        return res.status(500).json({ message: "Failed to create cart!" });
+      }
     }
 
     // ----------------------------------------------------
@@ -115,6 +135,7 @@ exports.postLoginUser = async (req, res) => {
       message: "Login Account Successfully!",
       accessToken,
       isLoggedIn: true,
+      cart: existingCart,
     });
   } catch (error) {
     console.log(error);
@@ -149,7 +170,7 @@ exports.getUser = async (req, res) => {
       env.REFRESHTOKEN
     );
 
-    if (resultDecoded.name === "TokenExpiredError") {
+    if (resultDecoded === "RefreshToken Expired") {
       // Update cookie + database
       res.clearCookie("refreshToken", { httpOnly: true, sameSite: "strict" });
       user.state = {};
@@ -166,14 +187,41 @@ exports.getUser = async (req, res) => {
       env.ACCESSTOKEN
     );
 
+    // Get cart of user from database
+    const cart = await Cart.findOne({ user: user._id }).select(
+      "items totalPrice"
+    );
+
+    if (!cart) {
+      return res.status(400).json({ message: "No found cart of user!" });
+    }
+
     res.status(201).json({
       message: "Create new accessToken!",
       accessToken: newAccessToken,
       isLoggedIn: true,
+      cart: cart,
     });
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error!",
     });
+  }
+};
+
+exports.getLogout = async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const user = await User.findByIdAndUpdate(userId, { state: {} });
+
+    if (!user) {
+      return res.status(400).json({ message: "No found user!" });
+    }
+
+    res.clearCookie("refreshToken", { httpOnly: true, sameSite: "strict" });
+    res.status(200).json({ message: "Logout Success!" });
+  } catch (error) {
+    res.status(500).json({ message: "Interval Server Error!" });
   }
 };

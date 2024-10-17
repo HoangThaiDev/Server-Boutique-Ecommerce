@@ -16,6 +16,7 @@ const corsOptions = {
   origin: "http://localhost:3000",
   optionsSuccessStatus: 200,
   credentials: true,
+  exposedHeaders: ["x-access-token"],
 };
 app.use(cors(corsOptions));
 app.use(express.json());
