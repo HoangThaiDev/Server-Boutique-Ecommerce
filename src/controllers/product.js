@@ -2,8 +2,9 @@
 const Product = require("../model/product");
 const Cart = require("../model/cart");
 
-// Import functions
+// Import Helpers
 const { filterProducts } = require("../helper/filterProducts");
+const { convertMoney } = require("../helper/convertMoney");
 
 exports.getProducts = async (req, res) => {
   try {
@@ -15,16 +16,7 @@ exports.getProducts = async (req, res) => {
 
     // Update Product: Convert Price => Money
     const modifiedProducts = products.map((product) => {
-      let VNMoney = new Intl.NumberFormat("vn-VN", {
-        style: "currency",
-        currency: "VND",
-      });
-
-      let formattedPrice = VNMoney.format(product.price)
-        .replace(/,/g, ".")
-        .replace("₫", "");
-
-      return { ...product, price: formattedPrice };
+      return { ...product, price: convertMoney(product.price) };
     });
 
     res.status(200).json(modifiedProducts);
@@ -58,16 +50,7 @@ exports.getProductsByQuery = async (req, res) => {
 
     // Update Product: Convert Price => Money
     const modifiedProducts = paginatedProducts.map((product) => {
-      let VNMoney = new Intl.NumberFormat("vn-VN", {
-        style: "currency",
-        currency: "VND",
-      });
-
-      let formattedPrice = VNMoney.format(product.price)
-        .replace(/,/g, ".")
-        .replace("₫", "");
-
-      return { ...product, price: formattedPrice };
+      return { ...product, price: convertMoney(product.price) };
     });
 
     res.status(200).json({
@@ -91,16 +74,7 @@ exports.getProduct = async (req, res) => {
     }
 
     // Modify Product: Property Price
-    let VNMoney = new Intl.NumberFormat("vn-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-
-    let formattedPrice = VNMoney.format(product.price)
-      .replace(/,/g, ".")
-      .replace("₫", "");
-
-    product.price = formattedPrice;
+    product.price = convertMoney(product.price);
 
     res.status(200).json(product);
   } catch (error) {
