@@ -33,6 +33,20 @@ const cartSchema = new Schema(
 );
 
 // Create methods of model
+cartSchema.methods.checkCart = function (valueProduct) {
+  if (this.items.length === 0) {
+    return true;
+  }
+
+  // Check if the product was existed in cart or not
+  const findIndexProduct = this.items.findIndex(
+    (item) => item.itemId.toString() === valueProduct.productId.toString()
+  );
+
+  const isProductOverLimit = this.items[findIndexProduct].quantity < 20;
+  return isProductOverLimit;
+};
+
 cartSchema.methods.addToCart = function (product) {
   const updateCart = { items: this.items, totalPrice: 0 };
 

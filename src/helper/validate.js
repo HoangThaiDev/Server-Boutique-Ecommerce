@@ -24,7 +24,7 @@ exports.checkValidateFormSignup = (formValues) => {
     }),
   });
 
-  // Dữ liệu form và lấy lỗi nếu có
+  // Add values form and check if has erros or not
   const { error } = schema.validate(
     {
       fullname: formValues.fullname,
@@ -32,7 +32,7 @@ exports.checkValidateFormSignup = (formValues) => {
       email: formValues.email,
       password: formValues.password,
     },
-    { abortEarly: false } // Tiếp tục kiểm tra lỗi chứ ko có dừng sau khi tìm thấy
+    { abortEarly: false } // Continue checking error if has error or not
   );
 
   if (error) {
@@ -63,13 +63,59 @@ exports.checkValidateFormLogin = (formValues) => {
     }),
   });
 
-  // Dữ liệu form và lấy lỗi nếu có
+  // Add values form and check if has erros or not
   const { error } = schema.validate(
     {
       email: formValues.email,
       password: formValues.password,
     },
-    { abortEarly: false } // Tiếp tục kiểm tra lỗi chứ ko có dừng sau khi tìm thấy
+    { abortEarly: false } // Continue checking error if has error or not
+  );
+
+  if (error) {
+    // Return an array of all error messages
+    const errorMessages = error.details.map((detail) => ({
+      path: detail.path,
+      message: detail.message,
+      showError: true,
+      type: detail.type,
+    }));
+    return errorMessages;
+  }
+  return true;
+};
+
+exports.checkValidateFormCheckout = (formValues) => {
+  const schema = Joi.object({
+    fullname: Joi.string().required().messages({
+      "string.empty": "Fullname is not allowed to be empty!",
+    }),
+    email: Joi.string()
+      .required()
+      .pattern(new RegExp("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.(com|net|org)$", "i"))
+      .messages({
+        "string.empty": "Email is not allowed to be empty!",
+        "string.pattern.base": "Email is invalid!",
+      }),
+    phone: Joi.string().required().min(10).max(10).messages({
+      "string.empty": "Password is not allowed to be empty!",
+      "string.min": "Password length must be at least 10 characters long!",
+      "string.max": "Password length must not exceed 10 characters!",
+    }),
+    address: Joi.string().required().messages({
+      "string.empty": "Fullname is not allowed to be empty!",
+    }),
+  });
+
+  // Add values form and check if has erros or not
+  const { error } = schema.validate(
+    {
+      fullname: formValues.fullname,
+      email: formValues.email,
+      phone: formValues.phone,
+      address: formValues.address,
+    },
+    { abortEarly: false } // Continue checking error if has error or not
   );
 
   if (error) {

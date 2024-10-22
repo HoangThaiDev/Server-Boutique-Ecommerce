@@ -4,9 +4,13 @@ const env = require("../config/enviroment");
 
 exports.isAuth = async (req, res, next) => {
   const accessToken = req.headers["authorization"].split(" ")[1];
-  const { refreshToken } = req.cookies;
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Session is expired!" });
+  }
 
   //   Decoded accessToken && refreshToken
+  const { refreshToken } = req.cookies;
   const accessTokenDecoded = await jwt.verifyAccessToken(
     accessToken,
     env.ACCESSTOKEN

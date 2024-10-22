@@ -50,22 +50,15 @@ exports.postDeleteItem = async (req, res) => {
       });
 
     // Delete item from cart
-    const filteredCartItems = cart.items.filter((item) => {
-      if (item._id.toString() !== itemId) {
-        console.log(item);
-        item.itemId.price = convertMoney(item.itemId.price);
-        item.totalPriceItem = convertMoney(item.totalPriceItem);
-        return item;
-      }
-    });
+    const filteredCartItems = cart.items.filter(
+      (item) => item._id.toString() !== itemId.toString()
+    );
 
-    // Calculator total price cart
+    // // Calculator total price cart
     const totalPrice = filteredCartItems
-      .reduce((acc, cur) => {
-        const forrmatedTotalPriceItem = cur.totalPriceItem.replace(/\./g, "");
-        return acc + parseInt(forrmatedTotalPriceItem);
-      }, 0)
+      .reduce((acc, cur) => acc + parseInt(cur.totalPriceItem), 0)
       .toString();
+    // console.log(filteredCartItems);
 
     const result = await Cart.findOneAndUpdate(
       { user: userId },
@@ -76,10 +69,19 @@ exports.postDeleteItem = async (req, res) => {
       return res.status(400).json({ message: "Delete Item Failled!!" });
     }
 
+    // Modify items (convert price => money)
+    const modifiedCartItems = filteredCartItems.map((item) => {
+      item.itemId.price = convertMoney(item.itemId.price);
+      item.totalPriceItem = convertMoney(item.totalPriceItem);
+      return item;
+    });
+
     res
       .status(200)
-      .json({ cart: filteredCartItems, totalPrice: convertMoney(totalPrice) });
+      .json({ cart: modifiedCartItems, totalPrice: convertMoney(totalPrice) });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: "Interval Server Error!" });
   }
 };

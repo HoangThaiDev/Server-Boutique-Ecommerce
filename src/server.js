@@ -7,6 +7,7 @@ const env = require("./config/enviroment");
 const productRouter = require("./router/product");
 const userRouter = require("./router/user");
 const cartRouter = require("./router/cart");
+const checkoutRouter = require("./router/checkout");
 
 // Create variables
 const app = express();
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use("/shop", productRouter);
 app.use("/user", userRouter);
 app.use("/cart", cartRouter);
+app.use("/checkout", checkoutRouter);
 
 // Create + use server
 mongooseConnect(() => {

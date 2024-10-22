@@ -91,7 +91,15 @@ exports.postAddToCart = async (req, res) => {
     const user = await Cart.findOne({ user: userId });
 
     if (!user) {
-      return res.status(500).json({ message: "No found cart of user!" });
+      return res.status(400).json({ message: "No found cart of user!" });
+    }
+
+    const isResultCheckCart = user.checkCart(product);
+
+    if (!isResultCheckCart) {
+      return res
+        .status(400)
+        .json({ message: "You have reached the limit for this product!" });
     }
 
     const result = user.addToCart(product);
@@ -102,6 +110,8 @@ exports.postAddToCart = async (req, res) => {
 
     res.status(200).json({ message: "Add to cart success!" });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: "Interval Server Error!" });
   }
 };
