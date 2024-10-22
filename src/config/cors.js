@@ -19,8 +19,6 @@ exports.corsOptions = {
     ) {
       return callback(null, true);
     }
-
-    return callback(new Error("Not allowed by CORS"));
   },
 
   optionsSuccessStatus: 200,
