@@ -8,6 +8,7 @@ const env = {
   AUTHOR: process.env.AUTHOR,
   ACCESSTOKEN: process.env.ACCESSTOKEN,
   REFRESHTOKEN: process.env.REFRESHTOKEN,
+  BUILD_MODE: process.env.BUILD,
 };
 
 module.exports = env;

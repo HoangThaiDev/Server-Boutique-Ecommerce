@@ -128,8 +128,9 @@ exports.postLoginUser = async (req, res) => {
 
     // ----------------------------------------------------
     res.cookie("refreshToken", refreshToken, {
+      secure: env.BUILD_MODE === "dev" ? false : true,
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: env.BUILD_MODE === "dev " ? "strict" : "none",
     });
     res.status(200).json({
       message: "Login Account Successfully!",
