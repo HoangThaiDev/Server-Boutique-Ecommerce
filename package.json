@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env BUILD=dev nodemon src/server.js",
-    "production": "cross-env BUILD=production node src/server.js"
+    "production": "cross-env BUILD=production nodemon src/server.js"
   },
   "author": "HoangThaiDev",
   "license": "ISC",
