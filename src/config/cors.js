@@ -25,6 +25,6 @@ exports.corsOptions = {
 
   optionsSuccessStatus: 200,
   credentials: true,
-  exposedHeaders: ["x-access-token"],
+  // exposedHeaders: ["x-access-token"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
