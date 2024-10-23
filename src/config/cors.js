@@ -19,10 +19,13 @@ exports.corsOptions = {
     ) {
       return callback(null, true);
     }
+
+    // Nếu origin không hợp lệ, gửi lại lỗi
+    callback(new Error("Not allowed by CORS"));
   },
 
   optionsSuccessStatus: 200,
   credentials: true,
-  // exposedHeaders: ["x-access-token"],
+  exposedHeaders: ["x-access-token"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
