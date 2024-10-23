@@ -15,11 +15,11 @@ const app = express();
 const server = require("http").Server(app);
 
 // Create + use Middleware
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("trust proxy", 1);
+app.use(cors(corsOptions));
 
 // Create + use server
 const connectServerWithDbs = () => {
@@ -49,6 +49,7 @@ const connectServerWithDbs = () => {
 };
 
 mongooseConnect(connectServerWithDbs);
+
 // Create + use routers
 app.use("/shop", productRouter);
 app.use("/user", userRouter);
