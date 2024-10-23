@@ -21,12 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("trust proxy", 1);
 
-// Create + use routers
-app.use("/shop", productRouter);
-app.use("/user", userRouter);
-app.use("/cart", cartRouter);
-app.use("/checkout", checkoutRouter);
-
 // Create + use server
 
 mongooseConnect(() => {
@@ -52,3 +46,9 @@ mongooseConnect(() => {
     });
   }
 });
+
+// Create + use routers
+app.use("/shop", productRouter);
+app.use("/user", userRouter);
+app.use("/cart", cartRouter);
+app.use("/checkout", checkoutRouter);
