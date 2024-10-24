@@ -130,7 +130,7 @@ exports.postLoginUser = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       secure: env.BUILD_MODE === "dev" ? false : true,
       httpOnly: true,
-      sameSite: env.BUILD_MODE === "dev " ? "strict" : "none",
+      sameSite: env.BUILD_MODE === "dev" ? "strict" : "none",
     });
     res.status(200).json({
       message: "Login Account Successfully!",
@@ -173,7 +173,7 @@ exports.getUser = async (req, res) => {
 
     if (resultDecoded === "RefreshToken Expired") {
       // Update cookie + database
-      res.clearCookie("refreshToken", { httpOnly: true, sameSite: "strict" });
+      res.clearCookie("refreshToken", { httpOnly: true, sameSite: "lax" });
       user.state = {};
       user.save();
 
