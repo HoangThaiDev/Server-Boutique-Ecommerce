@@ -5,10 +5,10 @@ const productController = require("../controllers/product");
 
 router.get("/products", productController.getProducts);
 
-router.get("/product/:productId", productController.getProduct);
+// router.get("/product/:productId", productController.getProduct);
 
-router.get("/products/query", productController.getProductsByQuery);
+// router.get("/products/query", productController.getProductsByQuery);
 
-router.post("/products/add-to-cart", isAuth, productController.postAddToCart);
+// router.post("/products/add-to-cart", isAuth, productController.postAddToCart);
 
 module.exports = router;
