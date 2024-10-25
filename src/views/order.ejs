@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .order {
+        width: 100%;
+      }
+      .order__container {
+        margin: 30px auto;
+        width: 100%;
+      }
+      .order__header {
+        font-family: "Roboto", sans-serif;
+        color: rgb(40, 40, 40);
+        margin-bottom: 20px;
+      }
+      .order__header__fullname {
+        font-size: 1.6rem;
+        letter-spacing: 0.6px;
+        color: rgb(35, 59, 70);
+        margin-bottom: 20px;
+      }
+      .order__header > p {
+        font-size: 1.6rem;
+        font-family: "Roboto", sans-serif;
+        color: rgb(40, 40, 40);
+      }
+      .order__section__title th,
+      .order__section__content td {
+        border: 2px solid rgb(156, 155, 155);
+        padding: 10px;
+        text-align: center;
+      }
+      .bg-name-product {
+        width: 25%;
+      }
+      .bg-image-product img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+      }
+      .bg-price-product,
+      .bg-quantity-product,
+      .bg-total-price {
+        width: 15%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="order">
+      <div class="order__container">
+        <header class="order__header">
+          <h1 class="order__header__fullname">
+            Xin chào <%= formValues.fullname %>
+          </h1>
+          <p>Phone: <%= formValues.phone %></p>
+          <p>Address: <%= formValues.address %></p>
+        </header>
+
+        <section class="order__section">
+          <table class="order__section__title" width="100%">
+            <tr>
+              <th class="bg-name-product">Tên sản phẩm</th>
+              <th class="bg-image-product">Hình ảnh</th>
+              <th class="bg-price-product">Giá</th>
+              <th class="bg-quantity-product">Số lượng</th>
+              <th class="bg-total-price">Thành tiền</th>
+            </tr>
+          </table>
+
+          <table class="order__section__content" width="100%">
+            <% items.forEach(item => { %>
+            <tr class="order__section__item">
+              <td class="bg-name-product"><%= item.itemId.name %></td>
+              <td class="bg-image-product">
+                <img
+                  src="<%= item.itemId.images[0] %>"
+                  alt="<%= item.itemId.images[0] %>"
+                />
+              </td>
+              <td class="bg-price-product"><%= item.itemId.price %> VND</td>
+              <td class="bg-quantity-product"><%= item.quantity %></td>
+              <td class="bg-total-price"><%= item.totalPriceItem %> VND</td>
+            </tr>
+            <% }); %>
+          </table>
+        </section>
+
+        <footer class="order__footer">
+          <table width="100%">
+            <tr>
+              <td style="text-align: right; padding: 10px; font-size: 1.2rem">
+                Tổng thanh toán: <%= totalPrice %> VND
+              </td>
+            </tr>
+          </table>
+          <h3 style="text-align: right; font-size: 1.2rem">Cảm ơn bạn!</h3>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
