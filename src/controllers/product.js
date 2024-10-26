@@ -85,6 +85,7 @@ exports.getProduct = async (req, res) => {
 exports.postAddToCart = async (req, res) => {
   const product = req.body.valueProduct;
   const userId = req.user;
+  console.log("product", product);
 
   try {
     // Check if the user has a shopping cart or not

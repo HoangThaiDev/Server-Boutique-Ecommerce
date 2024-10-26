@@ -43,6 +43,8 @@ cartSchema.methods.checkCart = function (valueProduct) {
     (item) => item.itemId.toString() === valueProduct.productId.toString()
   );
 
+  if (findIndexProduct === -1) return true;
+
   const isProductOverLimit = this.items[findIndexProduct].quantity < 20;
   return isProductOverLimit;
 };
