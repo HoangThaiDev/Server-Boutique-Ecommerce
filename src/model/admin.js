@@ -1,11 +1,7 @@
 const { Schema, default: mongoose } = require("mongoose");
 
-const userSchema = new Schema(
+const adminSchema = new Schema(
   {
-    fullname: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
@@ -15,9 +11,14 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    phone: {
+    info_detail: {
+      type: Object,
+    },
+    role: {
       type: String,
       required: true,
+      enum: ["client", "admin", "super-admin"],
+      default: "client",
     },
     state: {
       type: Object,
@@ -26,4 +27,4 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("admin", adminSchema);

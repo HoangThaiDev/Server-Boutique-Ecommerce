@@ -6,7 +6,7 @@ exports.isAuth = async (req, res, next) => {
   const accessToken = req.headers["authorization"].split(" ")[1];
 
   if (!accessToken) {
-    return res.status(401).json({ message: "Session is expired!" });
+    return res.status(200).json({ message: "Session is expired!" });
   }
 
   //   Decoded accessToken && refreshToken

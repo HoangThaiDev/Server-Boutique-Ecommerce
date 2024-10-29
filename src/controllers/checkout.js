@@ -13,7 +13,7 @@ exports.postCreateCheckout = async (req, res) => {
   const userId = req.user;
 
   // Check validate values of Form
-  const errorValues = validate.checkValidateFormCheckout(formValues);
+  const errorValues = validate.user.checkFormCheckout(formValues);
 
   if (errorValues.length > 0) {
     return res.status(400).json({

@@ -4,12 +4,15 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const mongooseConnect = require("./utils/database");
 const env = require("./config/enviroment");
+const { corsOptions } = require("./config/cors");
+const path = require("path");
+
+// Import Routers
 const productRouter = require("./router/product");
 const userRouter = require("./router/user");
 const cartRouter = require("./router/cart");
 const checkoutRouter = require("./router/checkout");
-const { corsOptions } = require("./config/cors");
-const path = require("path");
+const adminRouter = require("./router/admin");
 
 // Create variables
 const app = express();
@@ -61,3 +64,4 @@ app.use("/shop", productRouter);
 app.use("/user", userRouter);
 app.use("/cart", cartRouter);
 app.use("/checkout", checkoutRouter);
+app.use("/admin", adminRouter);
