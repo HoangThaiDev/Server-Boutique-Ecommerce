@@ -58,7 +58,6 @@ exports.postDeleteItem = async (req, res) => {
     const totalPrice = filteredCartItems
       .reduce((acc, cur) => acc + parseInt(cur.totalPriceItem), 0)
       .toString();
-    // console.log(filteredCartItems);
 
     const result = await Cart.findOneAndUpdate(
       { user: userId },

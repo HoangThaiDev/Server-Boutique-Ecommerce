@@ -20,7 +20,14 @@ const userSchema = new Schema(
       required: true,
     },
     state: {
-      type: Object,
+      refreshToken: {
+        type: String,
+        default: "",
+      },
+      isLoggedIn: {
+        type: Boolean,
+        default: false,
+      },
     },
   },
   { timestamps: true }

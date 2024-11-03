@@ -104,10 +104,8 @@ exports.postLoginUser = async (req, res) => {
     }
 
     // update state, create new cart in database
-    user.state = {
-      refreshToken: refreshToken,
-      isLoggedIn: true,
-    };
+    user.state.refreshToken = refreshToken;
+    user.state.isLoggedIn = true;
 
     const resultUser = await user.save();
 
@@ -167,8 +165,9 @@ exports.getUser = async (req, res) => {
     });
 
     if (!user) {
+      res.clearCookie("refreshToken", { httpOnly: true, sameSite: "lax" });
       return res.status(400).json({
-        message: "Session is expired!",
+        message: "Something wrong. Please login again!",
         isLoggedIn: false,
       });
     }
@@ -222,7 +221,12 @@ exports.getLogout = async (req, res) => {
   try {
     const userId = req.user;
 
-    const user = await User.findByIdAndUpdate(userId, { state: {} });
+    const user = await User.findByIdAndUpdate(userId, {
+      state: {
+        isLoggedIn: false,
+        refreshToken: "",
+      },
+    });
 
     if (!user) {
       return res.status(400).json({ message: "No found user!" });

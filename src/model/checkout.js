@@ -20,11 +20,13 @@ const checkoutSchema = new Schema(
       status: {
         type: String,
         required: true,
+        enum: ["Waiting for pay", "Paid"],
         default: "Waiting for pay",
       },
       delivery: {
         type: String,
         required: true,
+        enum: ["Waiting for progressing", "In progress", "Delivered"],
         default: "Waiting for progressing",
       },
     },

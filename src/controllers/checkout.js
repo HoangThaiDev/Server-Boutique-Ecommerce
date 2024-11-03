@@ -84,7 +84,6 @@ exports.getCheckout = async (req, res) => {
 
   try {
     const products = await Product.find();
-
     const checkouts = await Checkout.find({
       user: userId,
     }).lean();
@@ -114,6 +113,58 @@ exports.getCheckout = async (req, res) => {
 
     res.status(200).json(modifiedCheckouts);
   } catch (error) {
+    res.status(500).json({ message: "Interval Server Error!" });
+  }
+};
+
+exports.getCheckouts = async (req, res) => {
+  try {
+    const products = await Product.find();
+    const checkouts = await Checkout.find().lean();
+
+    if (!checkouts) {
+      return res.status(400).json({ message: "No found checkout!" });
+    }
+
+    const modifiedCheckouts = checkouts.map((checkout) => {
+      checkout.cart.totalPrice = convertMoney(checkout.cart.totalPrice);
+
+      // Continue modified Items of cart
+      let { items } = checkout.cart;
+
+      items = items.map((item) => {
+        item.totalPriceItem = convertMoney(item.totalPriceItem);
+        products.forEach((product) => {
+          if (item.itemId.toString() === product._id.toString()) {
+            item.itemId = product;
+          }
+        });
+        return item;
+      });
+
+      return checkout;
+    });
+
+    res.status(200).json(modifiedCheckouts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error!" });
+  }
+};
+
+exports.getCheckoutsByPage = async (req, res) => {
+  const { page } = req.query;
+  const pageSize = 8;
+
+  try {
+    const totalCheckouts = await Checkout.find().countDocuments();
+    const checkouts = await Checkout.find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.status(200).json({ checkouts, totalCheckouts });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Interval Server Error!" });
   }
 };

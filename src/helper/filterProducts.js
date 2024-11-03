@@ -3,11 +3,11 @@ exports.filterProducts = (query, products) => {
   let newProducts = [];
 
   //   Check query
-  if (query.category === "all") {
+  if (query.category === "all" || query.category === "other") {
     newProducts = sortProducts(products, query.option);
   }
 
-  if (query.category !== "all") {
+  if (query.category !== "all" && query.category !== "other") {
     const filteredProducts = products.filter(
       (p) => p.category === query.category
     );

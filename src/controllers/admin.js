@@ -77,6 +77,11 @@ exports.postLoginAdmin = async (req, res) => {
       return res.status(401).json({ message: "Invalid Email or Password!" });
     }
 
+    // Check user was loggedIn
+    if (admin.state.isLoggedIn) {
+      return res.status(400).json({ message: "Your account was using!" });
+    }
+
     // Check password is correct
     const doMatch = await bcrypt.compare(formValues.password, admin.password);
     if (!doMatch) {
@@ -98,9 +103,8 @@ exports.postLoginAdmin = async (req, res) => {
     }
 
     // Save refreshToken + create new cart in database
-    admin.state = {
-      refreshToken: refreshToken,
-    };
+    admin.state.refreshToken = refreshToken;
+    admin.state.isLoggedIn = true;
 
     const resultUser = await admin.save();
 
@@ -118,6 +122,7 @@ exports.postLoginAdmin = async (req, res) => {
       message: "Login Account Successfully!",
       accessToken,
       isLoggedIn: true,
+      role: admin.role,
     });
   } catch (error) {
     console.log(error);
@@ -140,6 +145,7 @@ exports.getAdmin = async (req, res) => {
     });
 
     if (!admin) {
+      res.clearCookie("refreshToken", { httpOnly: true, sameSite: "lax" });
       return res.status(401).json({
         message: "Session is expired!",
         isLoggedIn: false,
@@ -159,7 +165,10 @@ exports.getAdmin = async (req, res) => {
         httpOnly: true,
         sameSite: env.BUILD_MODE === "dev" ? "lax" : "none",
       });
-      admin.state = {};
+      admin.state = {
+        isLoggedIn: false,
+        refreshToken: "",
+      };
       admin.save();
 
       return res
@@ -203,6 +212,75 @@ exports.getLogout = async (req, res) => {
 
     res.status(200).json({ message: "Logout Success!" });
   } catch (error) {
+    res.status(500).json({ message: "Interval Server Error!" });
+  }
+};
+
+exports.getAdmins = async (req, res) => {
+  try {
+    const admins = await Admin.find().select({
+      "state.refreshToken": 0,
+      password: 0,
+    });
+
+    if (!admins) {
+      return res.status(400).json({ message: "No found admins!" });
+    }
+
+    res.status(200).json(admins);
+  } catch (error) {
+    res.status(500).json({ message: "Interval Server Error!" });
+  }
+};
+
+exports.getAdminsByPage = async (req, res) => {
+  const { page } = req.query;
+  const pageSize = 8;
+
+  try {
+    const totalAdmins = await Admin.find().countDocuments();
+    const admins = await Admin.find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.status(200).json({ admins, totalAdmins });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Interval Server Error!" });
+  }
+};
+
+exports.postUpdateAdmin = async (req, res) => {
+  const { adminId, roleSelect } = req.body;
+
+  try {
+    const admin = await Admin.findByIdAndUpdate(adminId, { role: roleSelect });
+
+    if (!admin) {
+      return res.status(400).json({ message: "Update Role Failled!" });
+    }
+
+    res.status(200).json({ message: "Update Role Success!" });
+  } catch (error) {
+    res.status(500).json({ message: "Interval Server Error!" });
+  }
+};
+
+exports.deleteAdmin = async (req, res) => {
+  const { adminId } = req.params;
+  console.log(adminId);
+
+  try {
+    const admin = await Admin.findByIdAndDelete(adminId);
+
+    if (!admin) {
+      return res.status(400).json({ message: "Delete Admin Failled!" });
+    }
+
+    res.status(200).json({ message: "Delete Admin Success!" });
+  } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: "Interval Server Error!" });
   }
 };

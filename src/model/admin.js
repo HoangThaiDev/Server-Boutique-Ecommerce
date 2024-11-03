@@ -21,7 +21,14 @@ const adminSchema = new Schema(
       default: "client",
     },
     state: {
-      type: Object,
+      refreshToken: {
+        type: String,
+        default: "",
+      },
+      isLoggedIn: {
+        type: Boolean,
+        default: false,
+      },
     },
   },
   { timestamps: true }

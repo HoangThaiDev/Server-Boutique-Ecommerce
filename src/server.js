@@ -6,6 +6,7 @@ const mongooseConnect = require("./utils/database");
 const env = require("./config/enviroment");
 const { corsOptions } = require("./config/cors");
 const path = require("path");
+const multer = require("multer");
 
 // Import Routers
 const productRouter = require("./router/product");
@@ -17,14 +18,40 @@ const adminRouter = require("./router/admin");
 // Create variables
 const app = express();
 const server = require("http").Server(app);
+const storageMulter = multer.diskStorage({
+  destination: (req, file, cb) => {
+    return cb(null, "./src/images");
+  },
+  filename: (req, file, cb) => {
+    const fileName = `${Date.now()}-${file.originalname}`;
+    return cb(null, fileName);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/pdf"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 // Create + use Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "images")));
 app.use(cookieParser());
 app.set("trust proxy", 1);
 app.use(cors(corsOptions));
 app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(
+  multer({ storage: storageMulter, fileFilter: fileFilter }).array("images")
+);
 
 // Create + use Template: EJS
 app.set("view engine", "ejs");
