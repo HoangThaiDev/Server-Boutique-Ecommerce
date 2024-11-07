@@ -1,3 +1,6 @@
+// Import Modules
+const env = require("../config/enviroment");
+
 // Import Models
 const Product = require("../model/product");
 const Cart = require("../model/cart");
@@ -86,7 +89,6 @@ exports.getProduct = async (req, res) => {
 exports.postAddToCart = async (req, res) => {
   const product = req.body.valueProduct;
   const userId = req.user;
-  console.log("product", product);
 
   try {
     // Check if the user has a shopping cart or not
@@ -138,10 +140,19 @@ exports.getProductsByPage = async (req, res) => {
 exports.postAddProduct = async (req, res) => {
   const productValues = req.body;
   const images = req.files;
+  let modifiedImages;
+  const BUILD_MODE = env.BUILD_MODE === "dev";
 
-  const modifiedImages = images.map(
-    (img) => `http://localhost:5000/${img.filename}`
-  );
+  // Check build mode is dev or production (http or https)
+  if (BUILD_MODE) {
+    modifiedImages = images.map(
+      (img) => `http://localhost:5000/${img.filename}`
+    );
+  } else {
+    modifiedImages = images.map(
+      (img) => `https://localhost:5000/${img.filename}`
+    );
+  }
 
   try {
     const newProduct = new Product({
@@ -179,7 +190,13 @@ exports.deleteProduct = async (req, res) => {
 
     // Delete img of product in folder images
     for (let image of product.images) {
-      const convertImage = image.replace("http://localhost:5000", "");
+      let convertImage;
+      if (env.BUILD_MODE === "dev") {
+        convertImage = image.replace("http://localhost:5000", "");
+      } else {
+        convertImage = image.replace("https://localhost:5000", "");
+      }
+
       deleteFileImage("src\\images\\" + convertImage);
     }
   } catch (error) {
@@ -191,9 +208,19 @@ exports.postUpdateProduct = async (req, res) => {
   const productValues = req.body;
   const imageFiles = req.files;
 
-  const modifiedImages = imageFiles.map(
-    (img) => `http://localhost:5000/${img.filename}`
-  );
+  let modifiedImages;
+  const BUILD_MODE = env.BUILD_MODE === "dev";
+
+  // Check build mode is dev or production (http or https)
+  if (BUILD_MODE) {
+    modifiedImages = images.map(
+      (img) => `http://localhost:5000/${img.filename}`
+    );
+  } else {
+    modifiedImages = images.map(
+      (img) => `https://localhost:5000/${img.filename}`
+    );
+  }
 
   try {
     const product = await Product.findById(productValues.id);
@@ -205,9 +232,15 @@ exports.postUpdateProduct = async (req, res) => {
       return res.status(400).json({ message: "Error with action: Delete!" });
     }
 
-    // Delete old image of product founded
+    // Delete img of product in folder images
     for (let image of product.images) {
-      const convertImage = image.replace("http://localhost:5000", "");
+      let convertImage;
+      if (env.BUILD_MODE === "dev") {
+        convertImage = image.replace("http://localhost:5000", "");
+      } else {
+        convertImage = image.replace("https://localhost:5000", "");
+      }
+
       deleteFileImage("src\\images\\" + convertImage);
     }
 
