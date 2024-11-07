@@ -1,6 +1,10 @@
 // Import Modules
 const router = require("express").Router();
-const { isAuthentication, isAuthorization } = require("../middleware/is-auth");
+const {
+  isAuthenticationForAdmin,
+  isAuthenticationForClient,
+  isAuthorization,
+} = require("../middleware/is-auth");
 const productController = require("../controllers/product");
 
 router.get("/products", productController.getProducts);
@@ -13,27 +17,27 @@ router.get("/products/page", productController.getProductsByPage);
 
 router.post(
   "/products/add-to-cart",
-  isAuthentication,
+  isAuthenticationForClient,
   productController.postAddToCart
 );
 
 router.post(
   "/product/add",
-  isAuthentication,
+  isAuthenticationForAdmin,
   isAuthorization,
   productController.postAddProduct
 );
 
 router.post(
   "/product/update",
-  isAuthentication,
+  isAuthenticationForAdmin,
   isAuthorization,
   productController.postUpdateProduct
 );
 
 router.delete(
   "/product/:productId",
-  isAuthentication,
+  isAuthenticationForAdmin,
   isAuthorization,
   productController.deleteProduct
 );

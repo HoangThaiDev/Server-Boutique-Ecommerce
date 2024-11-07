@@ -1,14 +1,18 @@
 // Import Modules
 const router = require("express").Router();
-const { isAuthentication } = require("../middleware/is-auth");
+const { isAuthenticationForClient } = require("../middleware/is-auth");
 const checkoutController = require("../controllers/checkout");
 
-router.post("/create", isAuthentication, checkoutController.postCreateCheckout);
+router.post(
+  "/create",
+  isAuthenticationForClient,
+  checkoutController.postCreateCheckout
+);
 
 router.get("/checkouts", checkoutController.getCheckouts);
 
 router.get("/checkouts/page", checkoutController.getCheckoutsByPage);
 
-router.get("/", isAuthentication, checkoutController.getCheckout);
+router.get("/", isAuthenticationForClient, checkoutController.getCheckout);
 
 module.exports = router;

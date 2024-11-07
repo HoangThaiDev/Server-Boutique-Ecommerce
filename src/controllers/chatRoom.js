@@ -110,7 +110,11 @@ exports.getJoinRoom = async (req, res) => {
     // Work with socketIO
     const rooms = await ChatRoom.find();
 
-    io.getIO().emit("Server:adminJoinRoom", { messages, rooms });
+    io.getIO().emit("Server:adminJoinRoom", {
+      messages,
+      rooms,
+      adminID: accessToken,
+    });
     res.status(200).json(messages);
   } catch (error) {
     console.log(error);

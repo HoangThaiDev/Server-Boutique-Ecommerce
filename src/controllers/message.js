@@ -8,6 +8,7 @@ const Session = require("../model/session");
 
 exports.getMessageByRoomId = async (req, res) => {
   const { roomId } = req.params;
+
   try {
     const findMessage = await Message.findOne({ chatRoomId: roomId });
 
@@ -87,6 +88,7 @@ exports.postSendMessageByRoomId = async (req, res) => {
       if (!result) {
         return res.status(404).json({ message: "Send message failled !" });
       }
+      console.log(result);
 
       // Use Socket
       if (sender === "client") {
