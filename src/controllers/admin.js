@@ -113,7 +113,7 @@ exports.postLoginAdmin = async (req, res) => {
     }
 
     // ----------------------------------------------------
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken_admin", refreshToken, {
       secure: env.BUILD_MODE === "dev" ? false : true,
       httpOnly: true,
       sameSite: env.BUILD_MODE === "dev" ? "lax" : "none",
@@ -131,21 +131,25 @@ exports.postLoginAdmin = async (req, res) => {
 };
 
 exports.getAdmin = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.cookies.refreshToken_admin;
 
-  // Check if the user is logged in
-  if (!refreshToken) {
-    return res.status(200).json({ isLoggin: false });
-  }
-
-  // Check refreshToken is Invalid or tampered in database (Collection: Admin)
+  // Check refreshToken is In valid or tampered in database (Collection: Admin)
   try {
+    // Check if the user is logged in
+    if (!refreshToken) {
+      return res.status(200).json({ isLoggin: false });
+    }
+
     const admin = await Admin.findOne({
       "state.refreshToken": refreshToken,
     });
 
     if (!admin) {
-      res.clearCookie("refreshToken", { httpOnly: true, sameSite: "lax" });
+      res.clearCookie("refreshToken_admin", {
+        httpOnly: true,
+        sameSite: "lax",
+      });
+
       return res.status(401).json({
         message: "Session is expired!",
         isLoggedIn: false,
@@ -186,6 +190,7 @@ exports.getAdmin = async (req, res) => {
       message: "Create new accessToken!",
       accessToken: newAccessToken,
       isLoggedIn: true,
+      role: admin.role,
     });
   } catch (error) {
     return res.status(500).json({

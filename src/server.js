@@ -7,6 +7,7 @@ const env = require("./config/enviroment");
 const { corsOptions } = require("./config/cors");
 const path = require("path");
 const multer = require("multer");
+const socket = require("./utils/socket");
 
 // Import Routers
 const productRouter = require("./router/product");
@@ -14,6 +15,9 @@ const userRouter = require("./router/user");
 const cartRouter = require("./router/cart");
 const checkoutRouter = require("./router/checkout");
 const adminRouter = require("./router/admin");
+const chatRoomRouter = require("./router/chatRoom");
+const sessionRouter = require("./router/session");
+const messageRouter = require("./router/message");
 
 // Create variables
 const app = express();
@@ -86,9 +90,24 @@ const connectServerWithDbs = () => {
 
 mongooseConnect(connectServerWithDbs);
 
+// Create + connect SocketIO --- Client - Admin side
+const io = socket.init(server);
+
+io.on("connection", (socket) => {
+  console.log("socket connection", socket.id);
+
+  socket.on("disconnect", (err) => {
+    console.log("disconnection", socket.id);
+  });
+});
+
 // Create + use routers
 app.use("/shop", productRouter);
 app.use("/user", userRouter);
 app.use("/cart", cartRouter);
 app.use("/checkout", checkoutRouter);
 app.use("/admin", adminRouter);
+app.use("/admin", adminRouter);
+app.use("/chatRoom", chatRoomRouter);
+app.use("/message", messageRouter);
+app.use("/session", sessionRouter);

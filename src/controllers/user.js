@@ -133,7 +133,7 @@ exports.postLoginUser = async (req, res) => {
     }
 
     // ----------------------------------------------------
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken_client", refreshToken, {
       secure: env.BUILD_MODE === "dev" ? false : true,
       httpOnly: true,
       sameSite: env.BUILD_MODE === "dev" ? "lax" : "none",
@@ -151,22 +151,26 @@ exports.postLoginUser = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-
-  // Check if the user is logged in
-  if (!refreshToken) {
-    return res.status(200).json({ isLoggin: false });
-  }
+  const refreshToken = req.cookies.refreshToken_client;
 
   // Check refreshToken is Invalid or tampered in database (Collection: User)
   try {
+    // Check if the user is logged in
+    if (!refreshToken) {
+      return res.status(200).json({ isLoggin: false });
+    }
+
     const user = await User.findOne({
       "state.refreshToken": refreshToken,
     });
 
     if (!user) {
-      res.clearCookie("refreshToken", { httpOnly: true, sameSite: "lax" });
-      return res.status(400).json({
+      res.clearCookie("refreshToken_client", {
+        httpOnly: true,
+        sameSite: "lax",
+      });
+
+      return res.status(404).json({
         message: "Something wrong. Please login again!",
         isLoggedIn: false,
       });
@@ -211,6 +215,8 @@ exports.getUser = async (req, res) => {
       cart: cart,
     });
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({
       message: "Internal Server Error!",
     });
