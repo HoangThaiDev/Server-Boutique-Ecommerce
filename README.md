@@ -1,5 +1,7 @@
-<!-- Account of DashBoard:
-    Email: admin@gmail.com
-    Password: superadmin1
-    Phone: 0123456789
- -->
+-- Các thông tin quan trọng:
+
+- Link Deploy: https://render.com
+- Account:
+  - Email: thaindev2000@gmail.com
+  - password: Thaipro123
+- Tên Project: Server-Boutique-Ecommerce
